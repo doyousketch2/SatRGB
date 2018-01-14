@@ -7,15 +7,15 @@
 ##  @ Doyousketch2
 ##  GNU GPLv3                 gnu.org/licenses/gpl-3.0.html
 """ required  ========================================="""
-##  you'll need imagemagick.  Try your package manager or
+##  You'll need imagemagick.  Try your package manager or
 ##  https://www.imagemagick.org/script/download.php
 
-##  you'll need easygui, depending on your OS:
+##  You'll need easygui, depending on your OS:
 ##        sudo pip3 install easygui
 ##        sudo python3 -m pip install easygui
 ##        py -m pip install easygui
 
-##  you might need the tkinter module
+##  You might need the tkinter module
 ##        sudo apt-get install python-tk python3-tk
 """ libs  ============================================="""
 import os                         ##  commandline utilities
