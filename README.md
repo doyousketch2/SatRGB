@@ -1,4 +1,9 @@
 **satrgb.py** -- *extract RGB images from Sega Saturn files*  
+Open one file, or an entire directory.  
+Select where you want your file(s) to be saved.  
+
+It reads header information to determine image size,  
+then uses ImageMagick to do the conversion.  
 
 ---
 
@@ -14,9 +19,3 @@ You might need the tkinter module
     `sudo apt-get install python-tk python3-tk`  
 
 ---
-
-Open one file, or an entire directory.  
-Select where you want your file(s) to be saved.  
-
-It reads header information to determine image size,  
-then uses ImageMagick to do the conversion.
