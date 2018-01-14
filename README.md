@@ -13,7 +13,7 @@ then uses ImageMagick to do the conversion.
 You'll need imagemagick.  Try your package manager or  
 https://www.imagemagick.org/script/download.php  
 
-You'll need easygui, depending on your OS:  
+You'll need **easygui**.  Depending on your OS:  
     `sudo pip3 install easygui`  
     `sudo python3 -m pip install easygui`  
     `py -m pip install easygui`  
