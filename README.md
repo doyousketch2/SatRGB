@@ -1,5 +1,4 @@
-satrgb.py  
-**extract RGB images from Sega Saturn files**
+satrgb.py  **extract RGB images from Sega Saturn files**  
 
 ---
 
