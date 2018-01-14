@@ -25,3 +25,9 @@ You'll need the **EasyGui** module for Python.  Depending on your OS:
 
 You might need the *tkinter* module (Debian, Ubuntu)  
     `sudo apt-get install python-tk python3-tk`  
+
+---
+Usage depends on how you call Python scripts within your OS:
+`./satrgb.py`  
+`py -m satrgb.py`  
+`python3 -m satrgb.py`  
