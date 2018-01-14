@@ -16,5 +16,5 @@ You might need the tkinter module
 Open one file, or an entire directory.  
 Select where you want your file(s) to be saved.  
 
-It reads header information to determine image size, 
+It reads header information to determine image size,  
 then uses ImageMagick to do the conversion.
