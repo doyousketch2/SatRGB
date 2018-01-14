@@ -18,5 +18,5 @@ You'll need **easygui**.  Depending on your OS:
     `sudo python3 -m pip install easygui`  
     `py -m pip install easygui`  
 
-You might need the *tkinter* module  
+You might need the *tkinter* module (Debian, Ubuntu)  
     `sudo apt-get install python-tk python3-tk`  
