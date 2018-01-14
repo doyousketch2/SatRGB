@@ -7,15 +7,15 @@
 ##  @ Doyousketch2
 ##  GNU GPLv3                 gnu.org/licenses/gpl-3.0.html
 """ required  ========================================="""
-##  You'll need imagemagick.  Try your package manager or
+##  you'll need imagemagick.  Try your package manager or
 ##  https://www.imagemagick.org/script/download.php
 
-##  You'll need easygui, depending on your OS:
+##  you'll need easygui, depending on your OS:
 ##        sudo pip3 install easygui
 ##        sudo python3 -m pip install easygui
 ##        py -m pip install easygui
 
-##  You might need the tkinter module
+##  you might need the tkinter module
 ##        sudo apt-get install python-tk python3-tk
 """ libs  ============================================="""
 import os                         ##  commandline utilities
@@ -33,7 +33,11 @@ def convert( img, outputpath ):
     Identifier  = data .read(0x10)
 
     if Identifier != MagicWord:
-      print( 'skipping  {}  header: {}'.format( tail, Identifier ) )
+      words  = Identifier.split(b'\x00')[0]
+      if len(words) < 1:  ##  don't bother printing a blank header
+        print( 'skipping  {}'.format( tail ) )
+      else:
+        print( 'skipping  {}  header: {}'.format( tail, words ) )
     else:  ##  found a match, convert it
       data .read(0x4)  ##  discard 0xFFFF FFFF
       data .read(0x4)  ##  discard 0x0000 0000
@@ -91,4 +95,3 @@ def main():
 main()
 
 """ eof  ==============================================="""
-
