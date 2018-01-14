@@ -10,7 +10,7 @@ then uses ImageMagick to do the conversion.
 
 ---
 
-You'll need imagemagick.  Try your package manager or  
+You'll need **imagemagick**.  Try your package manager or  
 https://www.imagemagick.org/script/download.php  
 
 You'll need **easygui**.  Depending on your OS:  
