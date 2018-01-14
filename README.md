@@ -28,6 +28,6 @@ You might need the *tkinter* module (Debian, Ubuntu)
 
 ---
 Usage depends on how you call Python scripts within your OS:  
-`./satrgb.py`  
-`py -m satrgb.py`  
-`python3 -m satrgb.py`  
+    `./satrgb.py`  
+    `py -m satrgb.py`  
+    `python3 -m satrgb.py`  
