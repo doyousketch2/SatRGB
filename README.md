@@ -9,8 +9,8 @@ It reads header information to determine image size,
 then uses ImageMagick to do the conversion.  
 
 ---
-You'll need **Python**.  You may already have it installed.  
-If not  https://www.python.org/downloads/
+You'll need **Python**.  You may already have it installed.  If not:  
+https://www.python.org/downloads
 
 You'll need **imagemagick**.  Try your package manager or  
 https://www.imagemagick.org/script/download.php  
