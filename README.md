@@ -14,7 +14,7 @@ https://www.python.org/downloads
 
 You'll need **ImageMagick**.  Try your package manager or  
 https://www.imagemagick.org/script/download.php  
-    `sudo apt-get install imagemagick'
+    `sudo apt-get install imagemagick`  
 
 You'll need **EasyGui**.  Depending on your OS:  
     `sudo pip3 install easygui`  
