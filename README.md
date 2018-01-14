@@ -1,4 +1,5 @@
 **satrgb.py** -- *extract RGB images from Sega Saturn files*  
+
 Open one file, or an entire directory.  
 Select where you want your file(s) to be saved.  
 
