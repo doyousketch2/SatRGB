@@ -11,7 +11,9 @@ You'll need easygui, depending on your OS:
     `py -m pip install easygui`  
 
 You might need the tkinter module  
-    `sudo apt-get install python-tk python3-tk`
+    `sudo apt-get install python-tk python3-tk`  
+
+---
 
 Open one file, or an entire directory.  
 Select where you want your file(s) to be saved.  
