@@ -43,20 +43,24 @@ def convert( img, outputpath ):
     DGT2DC   = b'DC'    ##  Direct Color
     DGT2RLE  = b'RL'    ##  RunLength Encoding
     AIFF     = b'FORM'  ##  Audio Interchange File
-    FILM     = b'FILM'  ##  Cinepack Codec
+    FILM     = b'FILM'  ##  Cinepack Codec - Audio and/or Video
+
+    skip  = '\033[31mSkipping\033[0m'
+    intro  = '\033[36m'
+    outro  = '\033[0m'
 
     ini  = ID[:2]
     if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
       ID  = ini
 
     elif ID[:4] == b'RIFF':
-      print( 'skipping  {}  AudioVideo Interleave / Resource Interchange FileFormat'.format( tail ) )
+      print( '{}  {} {} AudioVideo Interleave / Resource Interchange FileFormat {}'.format( skip, tail, intro, outro ) )
 
     elif root[:4] == b'cdda': 
-      print( 'skipping  {}  CDDA "Red Book" Audio'.format( tail ) )
+      print( '{}  {} {} CDDA "Red Book" Audio {}'.format( skip, tail, intro, outro ) )
 
     elif ID == SEGA2D:
-      print( 'skipping  {}  SEGA2D scroll data format'.format( tail ) )
+      print( '{}  {} {} SEGA2D scroll data format {}'.format( skip, tail, intro, outro ) )
 
     elif ID == RGB:
       data .read(0x4)  ##  discard 0xFFFF FFFF
@@ -83,32 +87,35 @@ def convert( img, outputpath ):
       ##  rgb:inpath/input.rgb  outpath/output.png
 
     elif ID == SX2D:
-      print( 'skipping  {}  Sega Super32X 2D scroll data'.format( tail ) )
+      print( '{}  {} {} Sega Super32X 2D scroll data {}'.format( skip, tail, intro, outro ) )
 
     elif ID == DGT2PP:
-      print( 'skipping  {}  DGT2 PP - Packed Pixel data'.format( tail ) )
+      print( '{}  {} {} DGT2 PP - Packed Pixel data {}'.format( skip, tail, intro, outro ) )
 
     elif ID == DGT2DC:
-      print( 'skipping  {}  DGT2 DC - Direct Color data'.format( tail ) )
+      print( '{}  {} {} DGT2 DC - Direct Color data {}'.format( skip, tail, intro, outro ) )
 
     elif ID == DGT2RLE:
-      print( 'skipping  {}  DGT2 RL - Run Length Encoding'.format( tail ) )
+      print( '{}  {} {} DGT2 RL - Run Length Encoding {}'.format( skip, tail, intro, outro ) )
 
     elif ID == AIFF:
-      print( 'skipping  {}  Audio Interchange File Format'.format( tail ) )
+      print( '{}  {} {} Audio Interchange File Format {}'.format( skip, tail, intro, outro ) )
 
     elif ID == FILM:
-      print( 'skipping  {}  Cinepak Codec video'.format( tail ) )
+      print( '{}  {} {} Cinepak Codec - Audio and/or Video {}'.format( skip, tail, intro, outro ) )
 
     else:
       Identifier2  = data .read(0x10)
       if Identifier2 == DGT:
-        print( 'skipping  {}  DGT index color mode'.format( tail ) )
+        print( '{}  {} {} DGT index color mode {}'.format( skip, tail, intro, outro ) )
+
+      elif ext == '.col':
+        print( '{}  {} {} Indexed Color Palette {}'.format( skip, tail, intro, outro ) )
 
       elif len(ID) < 1:  ##  don't bother printing a blank 0x00 or 0xFF header
-        print( 'skipping  {}'.format( tail ) )
+        print( '{}  {}'.format( skip, tail, intro, outro ) )
       else:
-        print( 'skipping  {}  header: {}'.format( tail, ID ) )
+        print( '{}  {} {} header: {} {}'.format( skip, tail, intro, ID, outro ) )
 
 
 def main():
@@ -158,7 +165,13 @@ def main():
         with open( prevoutdir, 'wb' ) as picklejar:
           pickle .dump( outputdir, picklejar )
         print( 'Scanning files in {}\n'.format( directory ) )
-        for name in os .listdir( directory ):
+
+        files  = os.listdir( directory )
+        def extension(x):
+           return os.path .splitext(x)[::-1]
+        files .sort( key = extension )
+
+        for name in files:
           obj  = os.path .join( directory, name )
           if os.path .isfile( obj ):
             convert( obj, outputdir )
