@@ -32,7 +32,9 @@ def convert( img, outputpath ):
     root, ext  = os.path .splitext( tail )
 
     Identifier   = data .read(0x10)
-    ID  = Identifier .split(b'\x00')[0] .split(b'\xFF')[0] .split(b'/')[0]
+    ID   = Identifier .split(b'\x00')[0] .split(b'\xFF')[0] .split(b'/')[0]
+    ID2  = ID[:2]
+    ID4  = ID[:4]
 
     SEGA2D   = b'SEGA_32BIT2DSCR\x1A'  ##  standard scroll data format
     DGT      = b'DIGITIZER 3 Ver2'     ##  index color mode
@@ -44,22 +46,14 @@ def convert( img, outputpath ):
     DGT2RLE  = b'RL'    ##  RunLength Encoding
     AIFF     = b'FORM'  ##  Audio Interchange File
     FILM     = b'FILM'  ##  Cinepack Codec - Audio and/or Video
+    ##  .mfc  header: b'Rev.EXB'  ??
+    ##  .arc  header: b'ARCH' 
 
     skip  = '\033[31mSkipping\033[0m'
     intro  = '\033[36m'
     outro  = '\033[0m'
 
-    ini  = ID[:2]
-    if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
-      ID  = ini
-
-    elif ID[:4] == b'RIFF':
-      print( '{}  {} {} AudioVideo Interleave / Resource Interchange FileFormat {}'.format( skip, tail, intro, outro ) )
-
-    elif root[:4] == b'cdda': 
-      print( '{}  {} {} CDDA "Red Book" Audio {}'.format( skip, tail, intro, outro ) )
-
-    elif ID == SEGA2D:
+    if ID == SEGA2D:
       print( '{}  {} {} SEGA2D scroll data format {}'.format( skip, tail, intro, outro ) )
 
     elif ID == RGB:
@@ -89,13 +83,13 @@ def convert( img, outputpath ):
     elif ID == SX2D:
       print( '{}  {} {} Sega Super32X 2D scroll data {}'.format( skip, tail, intro, outro ) )
 
-    elif ID == DGT2PP:
+    elif ID2 == DGT2PP:
       print( '{}  {} {} DGT2 PP - Packed Pixel data {}'.format( skip, tail, intro, outro ) )
 
-    elif ID == DGT2DC:
+    elif ID2 == DGT2DC:
       print( '{}  {} {} DGT2 DC - Direct Color data {}'.format( skip, tail, intro, outro ) )
 
-    elif ID == DGT2RLE:
+    elif ID2 == DGT2RLE:
       print( '{}  {} {} DGT2 RL - Run Length Encoding {}'.format( skip, tail, intro, outro ) )
 
     elif ID == AIFF:
@@ -104,10 +98,24 @@ def convert( img, outputpath ):
     elif ID == FILM:
       print( '{}  {} {} Cinepak Codec - Audio and/or Video {}'.format( skip, tail, intro, outro ) )
 
+    elif ID4 == b'RIFF':
+      print( '{}  {} {} AudioVideo Interleave / Resource Interchange FileFormat {}'.format( skip, tail, intro, outro ) )
+
+    elif root[:4] == b'cdda': 
+      print( '{}  {} {} CDDA "Red Book" Audio {}'.format( skip, tail, intro, outro ) )
+
     else:
       Identifier2  = data .read(0x10)
+      ## print('{}  {} {} Possible DGT index color mode {}'.format( skip, tail, intro, outro ))
       if Identifier2 == DGT:
         print( '{}  {} {} DGT index color mode {}'.format( skip, tail, intro, outro ) )
+
+      elif ext == '.snd':
+        print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, intro, outro ) )
+
+      elif ext[-1] .isdigit():
+        if ext[:-1] == '.en' or ext[:-1] == '.el':
+          print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, intro, outro ) )
 
       elif ext == '.col':
         print( '{}  {} {} Indexed Color Palette {}'.format( skip, tail, intro, outro ) )
@@ -131,13 +139,11 @@ def main():
       default_in  = pickle .load( picklejar )
   else:  default_in  = cwd
 
-
   prevoutdir  = os.path .join( cwd, 'outdir.pkl' )
   if os.path .isfile( prevoutdir ):
     with open( prevoutdir, 'rb' ) as picklejar:
       default_out  = pickle .load( picklejar )
   else:  default_out  = cwd
-
 
   if choice == 'one file':
     imagefile  = eg.fileopenbox( 'choose image', title, default_in )
@@ -166,15 +172,21 @@ def main():
           pickle .dump( outputdir, picklejar )
         print( 'Scanning files in {}\n'.format( directory ) )
 
-        files  = os.listdir( directory )
+        listing  = os.listdir( directory )
         def extension(x):
-           return os.path .splitext(x)[::-1]
-        files .sort( key = extension )
+          ##  split filename from extension, then reverse order
+          ##  so we can use extension as key, and filename as value
+          return os.path .splitext(x)[::-1]
+        listing .sort( key = extension )
 
-        for name in files:
+        for name in listing:
           obj  = os.path .join( directory, name )
           if os.path .isfile( obj ):
             convert( obj, outputdir )
+          else:  ##  dirs
+            intro  = '\033[35m'
+            outro  = '\033[0m'
+            print( intro, obj, outro )
         print( '\nFinished scanning files in {}'.format( directory ) )
   else:
     exit()
