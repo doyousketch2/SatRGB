@@ -29,16 +29,30 @@ def convert( img, outputpath ):
     head, tail = os.path .split( img )
     root, ext  = os.path .splitext( tail )
 
-    MagicWord  = b'SEGA 32BITGRAPH\x1a'
     Identifier  = data .read(0x10)
+    ID  = Identifier .split(b'\x00')[0] .split(b'\xFF')[0] .split(b'/')[0]
 
-    if Identifier != MagicWord:
-      words  = Identifier.split(b'\x00')[0]
-      if len(words) < 1:  ##  don't bother printing a blank header
-        print( 'skipping  {}'.format( tail ) )
-      else:
-        print( 'skipping  {}  header: {}'.format( tail, words ) )
-    else:  ##  found a match, convert it
+    SEGA2D   = b'SEGA_32BIT2DSCR\x1A'  ##  standard scroll data format
+    DGT      = b'DIGITIZER 3 Ver2'     ##  index color mode
+    RGB      = b'SEGA 32BITGRAPH\x1A'  ##  RGB color mode - 8 bit
+    SX2D     = b'Sega Super32X 2D'     ##  32X scroll data format
+    SEGA3D   = b'SEGA 3D'  ##  unused, but there's the header anyway
+    DGT2PP   = b'PP'    ##  Packed Pixel  handles 32,768 colors
+    DGT2DC   = b'DC'    ##  Direct Color
+    DGT2RLE  = b'RL'    ##  RunLength Encoding
+    FILM     = b'FILM'  ##  Cinepack Codec
+
+    ini  = ID[:2]
+    if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
+      ID  = ini
+
+    if ID == SEGA2D:
+      print( 'skipping  {}  SEGA2D scroll data format'.format( tail ) )
+
+    elif ID == DGT:
+      print( 'skipping  {}  DGT index color mode'.format( tail ) )
+
+    elif ID == RGB:
       data .read(0x4)  ##  discard 0xFFFF FFFF
       data .read(0x4)  ##  discard 0x0000 0000
 
@@ -59,9 +73,30 @@ def convert( img, outputpath ):
       outer  = os.path .join( outputpath, output )
       print( '{}\n{}\n{}\n'.format( call, inner, outer ) )
       os .system( call + inner + outer )
+      ##  convert -depth 8 -endian MSB -size 144x192+256
+      ##  rgb:inpath/input.rgb  outpath/output.png
 
-##  convert -depth 8 -endian MSB -size 144x192+256
-##  rgb:inpath/input.rgb  outpath/output.png
+    elif ID == SX2D:
+      print( 'skipping  {}  Sega Super32X 2D scroll data'.format( tail ) )
+
+    elif ID == DGT2PP:
+      print( 'skipping  {}  DGT2 PP - Packed Pixel data'.format( tail ) )
+
+    elif ID == DGT2DC:
+      print( 'skipping  {}  DGT2 DC - Direct Color data'.format( tail ) )
+
+    elif ID == DGT2RLE:
+      print( 'skipping  {}  DGT2 RL - Run Length Encoding'.format( tail ) )
+
+    elif ID == FILM:
+      print( 'skipping  {}  Cinepak Codec video'.format( tail ) )
+
+    else:
+      if len(ID) < 1:  ##  don't bother printing a blank 0x00 or 0xFF header
+        print( 'skipping  {}'.format( tail ) )
+      else:
+        print( 'skipping  {}  header: {}'.format( tail, ID ) )
+
 
 def main():
   info  = 'Convert Sega Saturn RGB images to PNG'
