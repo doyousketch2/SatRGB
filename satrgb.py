@@ -19,6 +19,7 @@
 ##        sudo apt-get install python-tk python3-tk
 """ libs  ============================================="""
 import os                         ##  commandline utilities
+import pickle                   ## save previously used dir
 from sys import exit
 import easygui as eg           ##  Graphical User Interface
 from binascii import hexlify   ##  convert bytes into ASCII
@@ -29,7 +30,8 @@ def convert( img, outputpath ):
     head, tail = os.path .split( img )
     root, ext  = os.path .splitext( tail )
 
-    Identifier  = data .read(0x10)
+    Identifier   = data .read(0x10)
+    Identifier2  = data .read(0x10)
     ID  = Identifier .split(b'\x00')[0] .split(b'\xFF')[0] .split(b'/')[0]
 
     SEGA2D   = b'SEGA_32BIT2DSCR\x1A'  ##  standard scroll data format
@@ -45,6 +47,9 @@ def convert( img, outputpath ):
     ini  = ID[:2]
     if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
       ID  = ini
+
+    if Identifier2 == DGT:
+      ID  = DGT
 
     if ID == SEGA2D:
       print( 'skipping  {}  SEGA2D scroll data format'.format( tail ) )
@@ -104,26 +109,50 @@ def main():
 
   choice  = eg.buttonbox( info, title, ['one file', 'entire directory'] )
 
+  cwd  = os.getcwd()
+  previndir  = os.path .join( cwd, 'indir.pkl' )
+  if os.path .isfile( previndir ):
+    with open( previndir, 'rb' ) as picklejar:
+      default_in  = pickle .load( picklejar )
+  else:  default_in  = cwd
+
+  prevoutdir  = os.path .join( cwd, 'outdir.pkl' )
+  if os.path .isfile( prevoutdir ):
+    with open( prevoutdir, 'rb' ) as picklejar:
+      default_out  = pickle .load( picklejar )
+  else:  default_out  = cwd
+
   if choice == 'one file':
-    imagefile  = eg.fileopenbox( 'choose image', title )
+    imagefile  = eg.fileopenbox( 'choose image', title, default_in )
     if imagefile is None:  exit()
     else:
-      outputdir  = eg.diropenbox( 'choose output dir', title )
+      head, tail = os.path .split( imagefile )
+      with open( previndir, 'wb' ) as picklejar:
+        pickle .dump( head, picklejar )
+      outputdir  = eg.diropenbox( 'choose output dir', title, default_out )
       if outputdir is None:  exit()
       else:
+        with open( prevoutdir, 'wb' ) as picklejar:
+          pickle .dump( outputdir, picklejar )
         convert( imagefile, outputdir )
 
   elif choice == 'entire directory':
-    directory  = eg.diropenbox( 'choose dir', title )
+    directory  = eg.diropenbox( 'choose dir', title, default_in )
     if directory is None:  exit()
     else:
-      outputdir  = eg.diropenbox( 'choose output dir', title )
+      with open( previndir, 'wb' ) as picklejar:
+        pickle .dump( directory, picklejar )
+      outputdir  = eg.diropenbox( 'choose output dir', title, default_out )
       if outputdir is None:  exit()
       else:
+        with open( prevoutdir, 'wb' ) as picklejar:
+          pickle .dump( directory, picklejar )
+        print( 'Scanning files in {}\n'.format( directory ) )
         for name in os .listdir( directory ):
           obj  = os.path .join( directory, name )
           if os.path .isfile( obj ):
             convert( obj, outputdir )
+        print( '\nFinished scanning files in {}'.format( directory ) )
   else:
     exit()
 
