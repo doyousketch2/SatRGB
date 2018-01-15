@@ -31,3 +31,7 @@ Usage depends on how you call Python scripts within your OS:
     `./satrgb.py`  
     `py -m satrgb.py`  
     `python3 -m satrgb.py`  
+
+Console output prints in color, so if  
+you're on an old version of windows  
+that doesn't, then enable VT100 emulation.
