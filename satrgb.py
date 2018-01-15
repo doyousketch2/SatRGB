@@ -7,15 +7,16 @@
 ##  @ Doyousketch2
 ##  GNU GPLv3                 gnu.org/licenses/gpl-3.0.html
 """ required  ========================================="""
-##  you'll need imagemagick.  Try your package manager or
+##  You'll need imagemagick.  Try your package manager or
 ##  https://www.imagemagick.org/script/download.php
+##        sudo apt-get install imagemagick
 
-##  you'll need easygui, depending on your OS:
+##  You'll need easygui, depending on your OS:
 ##        sudo pip3 install easygui
 ##        sudo python3 -m pip install easygui
 ##        py -m pip install easygui
 
-##  you might need the tkinter module
+##  You might need the tkinter module (Debian, Ubuntu)
 ##        sudo apt-get install python-tk python3-tk
 """ libs  ============================================="""
 import os                         ##  commandline utilities
@@ -48,7 +49,10 @@ def convert( img, outputpath ):
     if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
       ID  = ini
 
-    if root[:4] == 'cdda': 
+    elif ID[:4] == b'RIFF':
+      print( 'skipping  {}  AudioVideo Interleave / Resource Interchange FileFormat'.format( tail ) )
+
+    elif root[:4] == b'cdda': 
       print( 'skipping  {}  CDDA "Red Book" Audio'.format( tail ) )
 
     elif ID == SEGA2D:
@@ -89,6 +93,9 @@ def convert( img, outputpath ):
 
     elif ID == DGT2RLE:
       print( 'skipping  {}  DGT2 RL - Run Length Encoding'.format( tail ) )
+
+    elif ID == AIFF:
+      print( 'skipping  {}  Audio Interchange File Format'.format( tail ) )
 
     elif ID == FILM:
       print( 'skipping  {}  Cinepak Codec video'.format( tail ) )
