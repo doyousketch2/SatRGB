@@ -41,13 +41,17 @@ def convert( img, outputpath ):
     DGT2PP   = b'PP'    ##  Packed Pixel  handles 32,768 colors
     DGT2DC   = b'DC'    ##  Direct Color
     DGT2RLE  = b'RL'    ##  RunLength Encoding
+    AIFF     = b'FORM'  ##  Audio Interchange File
     FILM     = b'FILM'  ##  Cinepack Codec
 
     ini  = ID[:2]
     if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
       ID  = ini
 
-    if ID == SEGA2D:
+    if root[:4] == 'cdda': 
+      print( 'skipping  {}  CDDA "Red Book" Audio'.format( tail ) )
+
+    elif ID == SEGA2D:
       print( 'skipping  {}  SEGA2D scroll data format'.format( tail ) )
 
     elif ID == RGB:
@@ -113,11 +117,13 @@ def main():
       default_in  = pickle .load( picklejar )
   else:  default_in  = cwd
 
+
   prevoutdir  = os.path .join( cwd, 'outdir.pkl' )
   if os.path .isfile( prevoutdir ):
     with open( prevoutdir, 'rb' ) as picklejar:
       default_out  = pickle .load( picklejar )
   else:  default_out  = cwd
+
 
   if choice == 'one file':
     imagefile  = eg.fileopenbox( 'choose image', title, default_in )
@@ -143,7 +149,7 @@ def main():
       if outputdir is None:  exit()
       else:
         with open( prevoutdir, 'wb' ) as picklejar:
-          pickle .dump( directory, picklejar )
+          pickle .dump( outputdir, picklejar )
         print( 'Scanning files in {}\n'.format( directory ) )
         for name in os .listdir( directory ):
           obj  = os.path .join( directory, name )
