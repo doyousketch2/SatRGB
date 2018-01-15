@@ -124,21 +124,35 @@ def convert( img, outputpath ):
       if HeaderPart2 == DGT:
         print( '{}  {} {} DGT index color mode {}'.format( skip, tail, cyan, outro ) )
 
-      elif ext == '.snd' or ext == '.pcm':
-        print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
-
       elif ext:
         if ext[-1] .isdigit():
           if ext[:-1] == '.en' or ext[:-1] == '.el':
             print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
 
-      elif ext == '.col':
-        print( '{}  {} {} Indexed Color Palette {}'.format( skip, tail, cyan, outro ) )
+        elif ext == '.snd' or ext == '.pcm':
+          print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
 
-      elif len(ID) < 1:  ##  don't bother printing a blank 0x00 or 0xFF header
-        print( '{}  {}'.format( skip, tail, cyan, outro ) )
-      else:
+        elif ext == '.col' or ext == '.pal':
+          print( '{}  {} {} Indexed Color Palette {}'.format( skip, tail, cyan, outro ) )
+
+        elif ext == '.seq':
+          print( '{}  {} {} Saturn Sound Format sequence {}'.format( skip, tail, cyan, outro ) )
+
+        elif ext == '.bin':
+          print( '{}  {} {} Machine language {}'.format( skip, tail, cyan, outro ) )
+
+        elif len(ID) > 1:  ##  unknowns, print for observation
+          print( '{}  {} {} header: {} {}'.format( skip, tail, cyan, ID, outro ) )
+
+        else:  ##  don't bother printing a blank 0x00 or 0xFF header
+          print( '{}  {}'.format( skip, tail, cyan, outro ) )
+
+
+      elif len(ID) > 1:  ##  unknowns, print for observation
         print( '{}  {} {} header: {} {}'.format( skip, tail, cyan, ID, outro ) )
+
+      else:  ##  don't bother printing a blank 0x00 or 0xFF header
+        print( '{}  {}'.format( skip, tail, cyan, outro ) )
 
 
 def main():
