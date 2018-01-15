@@ -31,7 +31,6 @@ def convert( img, outputpath ):
     root, ext  = os.path .splitext( tail )
 
     Identifier   = data .read(0x10)
-    Identifier2  = data .read(0x10)
     ID  = Identifier .split(b'\x00')[0] .split(b'\xFF')[0] .split(b'/')[0]
 
     SEGA2D   = b'SEGA_32BIT2DSCR\x1A'  ##  standard scroll data format
@@ -48,14 +47,8 @@ def convert( img, outputpath ):
     if ini == DGT2PP or ini == DGT2DC or ini == DGT2RLE:
       ID  = ini
 
-    if Identifier2 == DGT:
-      ID  = DGT
-
     if ID == SEGA2D:
       print( 'skipping  {}  SEGA2D scroll data format'.format( tail ) )
-
-    elif ID == DGT:
-      print( 'skipping  {}  DGT index color mode'.format( tail ) )
 
     elif ID == RGB:
       data .read(0x4)  ##  discard 0xFFFF FFFF
@@ -97,7 +90,11 @@ def convert( img, outputpath ):
       print( 'skipping  {}  Cinepak Codec video'.format( tail ) )
 
     else:
-      if len(ID) < 1:  ##  don't bother printing a blank 0x00 or 0xFF header
+      Identifier2  = data .read(0x10)
+      if Identifier2 == DGT:
+        print( 'skipping  {}  DGT index color mode'.format( tail ) )
+
+      elif len(ID) < 1:  ##  don't bother printing a blank 0x00 or 0xFF header
         print( 'skipping  {}'.format( tail ) )
       else:
         print( 'skipping  {}  header: {}'.format( tail, ID ) )
