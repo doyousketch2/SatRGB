@@ -21,6 +21,7 @@
 """ libs  ============================================="""
 import os                         ##  commandline utilities
 import pickle                   ## save previously used dir
+import platform               ## determine if color teminal
 from sys import exit
 import easygui as eg           ##  Graphical User Interface
 from binascii import hexlify   ##  convert bytes into ASCII
@@ -41,20 +42,31 @@ def convert( img, outputpath ):
     RGB      = b'SEGA 32BITGRAPH\x1A'  ##  RGB color mode - 8 bit
     SX2D     = b'Sega Super32X 2D'     ##  32X scroll data format
     SEGA3D   = b'SEGA 3D'  ##  unused, but there's the header anyway
-    DGT2PP   = b'PP'    ##  Packed Pixel  handles 32,768 colors
+    DGT2PP   = b'PP'    ##  Packed Pixel  DGT2 types handle 15-bit colors
     DGT2DC   = b'DC'    ##  Direct Color
     DGT2RLE  = b'RL'    ##  RunLength Encoding
     AIFF     = b'FORM'  ##  Audio Interchange File
     FILM     = b'FILM'  ##  Cinepack Codec - Audio and/or Video
+    ##  .arc  header: b'ARCH'   ??  archive format
     ##  .mfc  header: b'Rev.EXB'  ??
-    ##  .arc  header: b'ARCH' 
 
-    skip  = '\033[31mSkipping\033[0m'
-    intro  = '\033[36m'
-    outro  = '\033[0m'
+    ##  enable color for terminals that support it
+    ten  = int( platform.release() .split('.')[0] )
+    if os.name == 'posix' or 'ANSICON' in os.environ or ten >= 10:
+      if ten >= 10:  ##  enable VT100 Escape Sequence for Win 10
+        os.system('')  ##  dunno if this voodoo does anything, try ANSICON instead
+      skip   = '\033[31mSkipping\033[0m'
+      cyan   = '\033[36m'
+      purple = '\033[35m'
+      outro  = '\033[0m'
+    else:
+      skip   = 'Skipping'
+      cyan   = ''
+      purple = ''
+      outro  = ''
 
     if ID == SEGA2D:
-      print( '{}  {} {} SEGA2D scroll data format {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} SEGA2D scroll data format {}'.format( skip, tail, cyan, outro ) )
 
     elif ID == RGB:
       data .read(0x4)  ##  discard 0xFFFF FFFF
@@ -81,52 +93,68 @@ def convert( img, outputpath ):
       ##  rgb:inpath/input.rgb  outpath/output.png
 
     elif ID == SX2D:
-      print( '{}  {} {} Sega Super32X 2D scroll data {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} Sega Super32X 2D scroll data {}'.format( skip, tail, cyan, outro ) )
 
     elif ID2 == DGT2PP:
-      print( '{}  {} {} DGT2 PP - Packed Pixel data {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} DGT2 PP - Packed Pixel data {}'.format( skip, tail, cyan, outro ) )
 
     elif ID2 == DGT2DC:
-      print( '{}  {} {} DGT2 DC - Direct Color data {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} DGT2 DC - Direct Color data {}'.format( skip, tail, cyan, outro ) )
 
     elif ID2 == DGT2RLE:
-      print( '{}  {} {} DGT2 RL - Run Length Encoding {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} DGT2 RL - Run Length Encoding {}'.format( skip, tail, cyan, outro ) )
 
     elif ID == AIFF:
-      print( '{}  {} {} Audio Interchange File Format {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} Audio Interchange File Format {}'.format( skip, tail, cyan, outro ) )
 
     elif ID == FILM:
-      print( '{}  {} {} Cinepak Codec - Audio and/or Video {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} Cinepak Codec - Audio and/or Video {}'.format( skip, tail, cyan, outro ) )
 
     elif ID4 == b'RIFF':
-      print( '{}  {} {} AudioVideo Interleave / Resource Interchange FileFormat {}'.format( skip, tail, intro, outro ) )
+      print( '{}  {} {} AudioVideo Interleave / Resource Interchange FileFormat {}'.format( skip, tail, cyan, outro ) )
 
-    elif root[:4] == b'cdda': 
-      print( '{}  {} {} CDDA "Red Book" Audio {}'.format( skip, tail, intro, outro ) )
+    elif tail[:4] == 'cdda': 
+      padding = ' ' * (len(tail) +10)
+      print( '{}  {} {} CDDA "Red Book" Audio {}'.format( skip, tail, cyan, outro ) )
+      print( '{} {} RAW 16‑bit Signed PCM,  44.1 kHz'.format( '\033[35m', padding, outro ) )
 
     else:
-      Identifier2  = data .read(0x10)
-      ## print('{}  {} {} Possible DGT index color mode {}'.format( skip, tail, intro, outro ))
-      if Identifier2 == DGT:
-        print( '{}  {} {} DGT index color mode {}'.format( skip, tail, intro, outro ) )
+      HeaderPart2  = data .read(0x10)
+      ## print('{}  {} {} Possible DGT index color mode {}'.format( skip, tail, cyan, outro ))
+      if HeaderPart2 == DGT:
+        print( '{}  {} {} DGT index color mode {}'.format( skip, tail, cyan, outro ) )
 
-      elif ext == '.snd':
-        print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, intro, outro ) )
+      elif ext == '.snd' or ext == '.pcm':
+        print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
 
-      elif ext[-1] .isdigit():
-        if ext[:-1] == '.en' or ext[:-1] == '.el':
-          print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, intro, outro ) )
+      elif ext:
+        if ext[-1] .isdigit():
+          if ext[:-1] == '.en' or ext[:-1] == '.el':
+            print( '{}  {} {} RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
 
       elif ext == '.col':
-        print( '{}  {} {} Indexed Color Palette {}'.format( skip, tail, intro, outro ) )
+        print( '{}  {} {} Indexed Color Palette {}'.format( skip, tail, cyan, outro ) )
 
       elif len(ID) < 1:  ##  don't bother printing a blank 0x00 or 0xFF header
-        print( '{}  {}'.format( skip, tail, intro, outro ) )
+        print( '{}  {}'.format( skip, tail, cyan, outro ) )
       else:
-        print( '{}  {} {} header: {} {}'.format( skip, tail, intro, ID, outro ) )
+        print( '{}  {} {} header: {} {}'.format( skip, tail, cyan, ID, outro ) )
 
 
 def main():
+  ##  enable color for terminals that support it
+  ten  = int( platform.release() .split('.')[0] )
+  if os.name == 'posix' or 'ANSICON' in os.environ or ten >= 10:
+    if ten >= 10:  ##  enable VT100 Escape Sequence for Win 10
+      os.system('')  ##  dunno if this voodoo does anything, try ANSICON instead
+    skip   = '\033[31mSkipping\033[0m'
+    purple = '\033[35m'
+    outro  = '\033[0m'
+  else:
+    skip   = 'Skipping'
+    purple = ''
+    outro  = ''
+
   info  = 'Convert Sega Saturn RGB images to PNG'
   title  = 'satrgb'
 
@@ -184,9 +212,7 @@ def main():
           if os.path .isfile( obj ):
             convert( obj, outputdir )
           else:  ##  dirs
-            intro  = '\033[35m'
-            outro  = '\033[0m'
-            print( intro, obj, outro )
+            print( skip, '        ', purple, obj, outro )
         print( '\nFinished scanning files in {}'.format( directory ) )
   else:
     exit()
