@@ -232,19 +232,68 @@ def convert( img, outputpath ):
       os .system( imagemagick + options + fullname )
 
     elif ID2 == DGT2RLE:
-      print( '{}  {} {}  DGT2 RL - Run Length Encoding {}'.format( skip, tail, cyan, outro ) )
-      '''
-      data .seek(0x02)
+      print( '{}  {} {}  DGT2 RL - Run Length Encoding {}'.format( decode, tail, cyan, outro ) )
+      data .seek(0x02)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
-      h  = hexlify( data .read(0x02) )
+      h  = hexlify( data .read(0x02) )  ##  0x02 = 16 bit word
 
       width   = int( w, 16 )
       height  = int( h, 16 )
-      CLUT  = data .read(256)
-      while data:
-        index  = data .read(0x01)
-        repeat  = data .read(0x01)
-      '''
+
+      CLUT  = bytearray()
+      for x in range( 256 ):  ##  256 possible colors in table
+        sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
+
+        ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
+        fifteenbit  = format( color, '0>16b' )
+
+        bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
+        gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
+        rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
+
+        ##  expand 5 bits to 8
+        BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
+        GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
+        RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
+
+        CLUT .append( RR )
+        CLUT .append( GG )
+        CLUT .append( BB )
+
+      barr  = bytearray()
+      data2read  = True
+      while data2read:
+        try:
+          runlength  = int( hexlify( data .read(0x01) ), 16 )
+          eightbit  = int( hexlify( data .read(0x01) ), 16 )
+        except:  data2read  = False  ##  quit trying once there's nothing left to read
+
+        for x in range( runlength ):  ##  repeat amount specified by run length
+          RR  = CLUT[ eightbit *3 ]
+          GG  = CLUT[ eightbit *3 +1 ]
+          BB  = CLUT[ eightbit *3 +2 ]
+          AA  = 255     ##  full alpha, no transparency
+
+          barr .append( AA )  ##  Image is mirrored and upside-down.
+          barr .append( BB )  ##  data's being stored as ABGR here,
+          barr .append( GG )  ##  this will actually read as RGBA in a moment,
+          barr .append( RR )  ##  once we reverse the bytearray()
+
+      barr .reverse()  ## this fixes the upside-down part
+      data  = generate_png( barr, width, height )
+
+      outputname  = '{}.rl.png'.format( tail )
+      fullname  = os.path .join( outputpath, outputname )
+      with open( fullname, 'wb' ) as output:
+        output .write( data )
+
+      ##  it's right-side-up now, but backwards, need to mirror it.
+                                 ##  'convert' would generate a new image
+      imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
+      options  = '-flop '        ##  -flop  = horizontal flip
+
+      os .system( imagemagick + options + fullname )
+
 
     elif ID == AIFF:
       print( '{}  {} {}  Audio Interchange File Format {}'.format( skip, tail, cyan, outro ) )
