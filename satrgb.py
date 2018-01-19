@@ -96,7 +96,7 @@ def convert( img, outputpath ):
 
     elif ID == RGB:
       print( '{}  {} {}  SEGA_32BITGRAPH data for RGB color mode {}'.format( decode, tail, cyan, outro ) )
-      data .seek(0x18)
+      data .seek(0x18)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
       h  = hexlify( data .read(0x02) )
 
@@ -111,11 +111,12 @@ def convert( img, outputpath ):
       call  = '' .join( args )
 
       inner  = 'RGB:{} '.format( img )
-      output  = '{}.png'.format( root )
-      outer  = os.path .join( outputpath, output )
+      outer  = '{}.png'.format( root )
+      output  = os.path .join( outputpath, outer )
 
-      print( '{}\n{}\n{}\n'.format( call, inner, outer ) )
-      os .system( call + inner + outer )
+      os .system( call + inner + output )
+      print( '{}\n{}\n{}\n'.format( call, inner, output ) )
+
       ##  convert -depth 8 -endian MSB -size 144x192+256
       ##  rgb:inpath/input.rgb  outpath/output.png
 
@@ -137,7 +138,7 @@ def convert( img, outputpath ):
 
     elif ID2 == DGT2DC:
       print( '{}  {} {}  DGT2 DC - Direct Color data {}'.format( decode, tail, cyan, outro ) )
-      data .seek(0x02)
+      data .seek(0x02)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
       h  = hexlify( data .read(0x02) )
 
@@ -145,7 +146,6 @@ def convert( img, outputpath ):
       height  = int( h, 16 )
 
       barr  = bytearray()
-      mirr  = bytearray()
       data2read  = True
       while data2read:
         try:  sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
@@ -162,22 +162,27 @@ def convert( img, outputpath ):
         BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
         GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
         RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
-        AA  = 255  ##  full alpha, no transparency
+        AA  = 255     ##  full alpha, no transparency
 
-        barr .append( AA )
-        barr .append( BB )
-        barr .append( GG )
-        barr .append( RR )
+        barr .append( AA )  ##  Image is mirrored and upside-down.
+        barr .append( BB )  ##  data's being stored as ABGR here,
+        barr .append( GG )  ##  this will actually read as RGBA in a moment,
+        barr .append( RR )  ##  once we reverse the bytearray()
 
-      ##  image is mirrored and upside-down
       barr .reverse()  ## this fixes the upside-down part
       data  = generate_png( barr, width, height )
 
-      outputname  = '{}.png'.format( tail )
+      outputname  = '{}.dc.png'.format( tail )
       fullname  = os.path .join( outputpath, outputname )
       with open( fullname, 'wb' ) as output:
         output .write( data )
 
+      ##  it's right-side-up now, but backwards, need to mirror it.
+                                 ##  'convert' would generate a new image
+      imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
+      options  = '-flop '        ##  -flop  = horizontal flip
+
+      os .system( imagemagick + options + fullname )
 
     elif ID2 == DGT2RLE:
       print( '{}  {} {}  DGT2 RL - Run Length Encoding {}'.format( skip, tail, cyan, outro ) )
