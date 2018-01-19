@@ -98,7 +98,7 @@ def convert( img, outputpath ):
       print( '{}  {} {}  SEGA_32BITGRAPH data in RGB color mode {}'.format( decode, tail, cyan, outro ) )
       data .seek(0x18)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
-      h  = hexlify( data .read(0x02) )
+      h  = hexlify( data .read(0x02) )  ##  0x02 = 16 bit word
 
       offset  = 256
       width   = int( w, 16 )
@@ -111,36 +111,83 @@ def convert( img, outputpath ):
       call  = '' .join( args )
 
       inner  = 'RGB:{} '.format( img )
-      outer  = '{}.png'.format( root )
+      outer  = '{}.rgb.png'.format( root )
       output  = os.path .join( outputpath, outer )
 
       os .system( call + inner + output )
       print( '{}\n{}\n{}\n'.format( call, inner, output ) )
 
       ##  convert -depth 8 -endian MSB -size 144x192+256
-      ##  rgb:inpath/input.rgb  outpath/output.png
+      ##  rgb:inpath/input.rgb  outpath/output.rgb.png
 
     elif ID == SX2D:
       print( '{}  {} {}  Sega Super32X 2D scroll data {}'.format( skip, tail, cyan, outro ) )
 
     elif ID2 == DGT2PP:
-      print( '{}  {} {}  DGT2 PP - Packed Pixel data {}'.format( skip, tail, cyan, outro ) )
-      '''
-      data .seek(0x02)
+      print( '{}  {} {}  DGT2 PP - Packed Pixel data {}'.format( decode, tail, cyan, outro ) )
+      data .seek(0x02)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
-      h  = hexlify( data .read(0x02) )
+      h  = hexlify( data .read(0x02) )  ##  0x02 = 16 bit word
 
       width   = int( w, 16 )
       height  = int( h, 16 )
-      CLUT  = data .read(256)
-      image = data .read()
-      '''
+
+      CLUT  = bytearray()
+      for x in range( 256 ):  ##  256 possible colors in table
+        sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
+
+        ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
+        fifteenbit  = format( color, '0>16b' )
+
+        bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
+        gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
+        rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
+
+        ##  expand 5 bits to 8
+        BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
+        GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
+        RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
+
+        CLUT .append( RR )
+        CLUT .append( GG )
+        CLUT .append( BB )
+
+      barr  = bytearray()
+      data2read  = True
+      while data2read:
+        try:  eightbit  = int( hexlify( data .read(0x01) ), 16 )
+        except:  data2read  = False  ##  quit trying once there's nothing left to read
+
+        RR  = CLUT[ eightbit *3 ]
+        GG  = CLUT[ eightbit *3 +1 ]
+        BB  = CLUT[ eightbit *3 +2 ]
+        AA  = 255     ##  full alpha, no transparency
+
+        barr .append( AA )  ##  Image is mirrored and upside-down.
+        barr .append( BB )  ##  data's being stored as ABGR here,
+        barr .append( GG )  ##  this will actually read as RGBA in a moment,
+        barr .append( RR )  ##  once we reverse the bytearray()
+
+      barr .reverse()  ## this fixes the upside-down part
+      data  = generate_png( barr, width, height )
+
+      outputname  = '{}.pp.png'.format( tail )
+      fullname  = os.path .join( outputpath, outputname )
+      with open( fullname, 'wb' ) as output:
+        output .write( data )
+
+      ##  it's right-side-up now, but backwards, need to mirror it.
+                                 ##  'convert' would generate a new image
+      imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
+      options  = '-flop '        ##  -flop  = horizontal flip
+
+      os .system( imagemagick + options + fullname )
 
     elif ID2 == DGT2DC:
       print( '{}  {} {}  DGT2 DC - Direct Color data {}'.format( decode, tail, cyan, outro ) )
       data .seek(0x02)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
-      h  = hexlify( data .read(0x02) )
+      h  = hexlify( data .read(0x02) )  ##  0x02 = 16 bit word
 
       width   = int( w, 16 )
       height  = int( h, 16 )
@@ -151,7 +198,7 @@ def convert( img, outputpath ):
         try:  sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
         except:  data2read  = False  ##  quit trying once there's nothing left to read
 
-        ##  still 16 bits, we'll just ignore top bit  xbbbbbgggggrrrrr
+        ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
         fifteenbit  = format( sixteenbit, '0>16b' )
 
         bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
