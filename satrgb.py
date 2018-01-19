@@ -118,7 +118,7 @@ def convert( img, outputpath ):
       print( '{}\n{}\n{}\n'.format( call, inner, output ) )
 
       ##  convert -depth 8 -endian MSB -size 144x192+256
-      ##  rgb:inpath/input.rgb  outpath/output.rgb.png
+      ##  RGB:inpath/input.rgb  outpath/output.rgb.png
 
     elif ID == SX2D:
       print( '{}  {} {}  Sega Super32X 2D scroll data {}'.format( skip, tail, cyan, outro ) )
@@ -325,7 +325,50 @@ def convert( img, outputpath ):
           print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
 
         elif ext == '.col' or ext == '.pal':
-          print( '{}  {} {}  CLUT / Color LookUp Table / Indexed Palette {}'.format( skip, tail, cyan, outro ) )
+          print( '{}  {} {}  CLUT / Color LookUp Table / Indexed Palette {}'.format( decode, tail, cyan, outro ) )
+
+          data .seek(0x00)
+          CLUT  = bytearray()
+          colors  = 0
+          data2read  = True
+          while data2read:
+            try:  
+              sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
+              colors += 1
+
+              ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
+              fifteenbit  = format( sixteenbit, '0>16b' )
+
+              bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
+              gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
+              rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
+
+              ##  expand 5 bits to 8
+              BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
+              GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
+              RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
+              AA  = 255     ##  full alpha, no transparency
+
+              CLUT .append( RR )
+              CLUT .append( GG )
+              CLUT .append( BB )
+              CLUT .append( AA )
+            except:  data2read  = False  ##  quit trying once there's nothing left to read
+
+          print( colors, 'Colors', '\n' )
+
+          if   colors > 32: width  = 16
+          elif colors > 16: width  = 8
+          elif colors > 8:  width  = 4
+          else:             width  = 1
+
+          height = colors //width
+          data   = generate_png( CLUT, width, height )
+
+          outputname  = '{}.png'.format( tail )
+          fullname  = os.path .join( outputpath, outputname )
+          with open( fullname, 'wb' ) as output:
+            output .write( data )
 
         elif ext == '.seq':
           print( '{}  {} {}  Saturn Sound Format sequence {}'.format( skip, tail, cyan, outro ) )
@@ -334,6 +377,7 @@ def convert( img, outputpath ):
           print( '{}  {} {}  Machine language {}'.format( skip, tail, cyan, outro ) )
 
         elif ext == '.raw':
+          print( '{}  {} {}  RAW image {}'.format( decode, tail, cyan, outro ) )
           width   = 320
           height  = 224
           depth   = 15
@@ -344,13 +388,24 @@ def convert( img, outputpath ):
           call  = '' .join( args )
 
           inner  = 'RGB:{} '.format( img )
-          output  = '{}.png'.format( root )
-          outer  = os.path .join( outputpath, output )
+          outer  = '{}.raw.png'.format( root )
+          output  = os.path .join( outputpath, outer )
 
-          print( '{}\n{}\n{}\n'.format( call, inner, outer ) )
-          os .system( call + inner + outer )
+          print( '{}\n{}\n{}\n'.format( call, inner, output ) )
+          os .system( call + inner + output )
           ##  convert -depth 16 -endian MSB -size widthxheight
-          ##  rgb:inpath/input.rgb  outpath/output.png
+          ##  RGB:inpath/input.rgb  outpath/output.png
+
+        elif ext == '.tga':
+          print( '{}  {} {}  Truevision TGA image {}'.format( decode, tail, cyan, outro ) )
+          call  = 'convert '
+          inner  = 'TGA:{} '.format( img )
+          outer  = '{}.tga.png'.format( root )
+          output  = os.path .join( outputpath, outer )
+
+          print( '{}{}\n            {}\n'.format( call, inner, output ) )
+          os .system( call + inner + output )
+          ##  convert TGA:inpath/input.tga outpath/output.raw.png
 
         elif len(ID) > 1:  ##  unknowns, print for observation
           print( '{}  {} {}  header: {} {}'.format( skip, tail, cyan, ID, outro ) )
