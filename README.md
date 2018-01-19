@@ -6,7 +6,8 @@
 So far, this script extracts:  
 >SEGA_32BITGRAPH data in RGB color mode  
 >DGT2 DC - Direct Color data  
-There's a few more formats, I'll add them as I figure 'em out.  
+
+There's a few more formats, I'll add them, once deciphered.  
 
 Open one file, or an entire directory.  
 Select where you want your file(s) to be saved.  
