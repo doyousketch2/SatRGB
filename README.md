@@ -6,6 +6,7 @@
 So far, this script extracts:  
 >SEGA_32BITGRAPH data in RGB color mode  
 >DGT2 DC - Direct Color data  
+>CLUT / Color LookUp Table / Indexed Palette
 
 Can possibly read, need to find a disk with these image types to test on.  
 >DGT2 RL - Run Length Encoding  
