@@ -95,7 +95,7 @@ def convert( img, outputpath ):
       print( '{}  {} {}  SEGA2D scroll data format {}'.format( skip, tail, cyan, outro ) )
 
     elif ID == RGB:
-      print( '{}  {} {}  SEGA_32BITGRAPH data for RGB color mode {}'.format( decode, tail, cyan, outro ) )
+      print( '{}  {} {}  SEGA_32BITGRAPH data in RGB color mode {}'.format( decode, tail, cyan, outro ) )
       data .seek(0x18)  ##  header, where size is stored
       w  = hexlify( data .read(0x02) )
       h  = hexlify( data .read(0x02) )
