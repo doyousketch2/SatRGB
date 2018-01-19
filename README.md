@@ -7,7 +7,9 @@ So far, this script extracts:
 >SEGA_32BITGRAPH data in RGB color mode  
 >DGT2 DC - Direct Color data  
 
->DGT2 PP - Packed Pixel data -- possibly, need to find a disk with these images to test on
+Can possibly read, need to find a disk with these image types to test on.
+>DGT2 RL - Run Length Encoding
+>DGT2 PP - Packed Pixel data
 
 There's a few more formats, I'll add them, once deciphered.  
 
