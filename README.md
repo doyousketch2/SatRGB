@@ -52,5 +52,5 @@ or try ANSICON  http://adoxa.altervista.org/ansicon
 
 Apps that do well for extractiong / viewing:  
 >GIMP - images  
->VLC - video 
+>VLC - video  
 >Audacity - audio  
