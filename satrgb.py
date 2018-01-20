@@ -28,6 +28,8 @@ import easygui as eg           ##  Graphical User Interface
 from binascii import hexlify   ##  convert bytes into ASCII
 """ script  ============================================"""
 
+info  = 'Convert Sega Saturn RGB images to PNG'
+title  = 'satrgb'
 
 def generate_png( buf, width, height ): 
   import zlib, struct
@@ -62,6 +64,7 @@ def convert( img, outputpath ):
     ID4  = ID[:4]  ##  a few types use 4 chars
 
     SEGA2D   = b'SEGA_32BIT2DSCR\x1A'  ##  standard scroll data format
+    SCR      = b'SEGA SATURN SCR'      ##
     DGT      = b'DIGITIZER 3 Ver2'     ##  index color mode
     RGB      = b'SEGA 32BITGRAPH\x1A'  ##  RGB color mode - 8 bit
     SX2D     = b'Sega Super32X 2D'     ##  32X scroll data format
@@ -71,8 +74,15 @@ def convert( img, outputpath ):
     DGT2RLE  = b'RL'    ##  RunLength Encoding
     AIFF     = b'FORM'  ##  Audio Interchange File
     FILM     = b'FILM'  ##  Cinepack Codec - Audio and/or Video
-    ##  .arc  header: b'ARCH'   ??  archive format
-    ##  .mfc  header: b'Rev.EXB'  ??
+
+    ##   ext  header:      best guess            example of filetype found in...
+    ##  ~~~~  ~~~~~~       ~~~~~~~~~~~           ~~~~~~~
+    ##  .arc  b'ARCH'      archive format        Zero Divide
+    ##  .bz   b'BZ.w\x01'  nonstandard bzip      Tamagatchi Park
+    ##  .mf                multi file            Cotton 2
+    ##  .mfc  b'Rev.EXB'   similar to .tar
+    ##  .mid               nonstandard MIDI      Mortal Kombat 2
+    ##  .mat               3D material
 
     ##  enable color for terminals that support it
     ten  = int( platform.release() .split('.')[0] )
@@ -91,8 +101,10 @@ def convert( img, outputpath ):
       purple = ''
       outro  = ''
 
+
     if ID == SEGA2D:
       print( '{}  {} {}  SEGA2D scroll data format {}'.format( skip, tail, cyan, outro ) )
+
 
     elif ID == RGB:
       print( '{}  {} {}  SEGA_32BITGRAPH data in RGB color mode {}'.format( decode, tail, cyan, outro ) )
@@ -120,8 +132,10 @@ def convert( img, outputpath ):
       ##  convert -depth 8 -endian MSB -size 144x192+256
       ##  RGB:inpath/input.rgb  outpath/output.rgb.png
 
+
     elif ID == SX2D:
       print( '{}  {} {}  Sega Super32X 2D scroll data {}'.format( skip, tail, cyan, outro ) )
+
 
     elif ID2 == DGT2PP:
       print( '{}  {} {}  DGT2 PP - Packed Pixel data {}'.format( decode, tail, cyan, outro ) )
@@ -183,6 +197,7 @@ def convert( img, outputpath ):
 
       os .system( imagemagick + options + fullname )
 
+
     elif ID2 == DGT2DC:
       print( '{}  {} {}  DGT2 DC - Direct Color data {}'.format( decode, tail, cyan, outro ) )
       data .seek(0x02)  ##  header, where size is stored
@@ -230,6 +245,7 @@ def convert( img, outputpath ):
       options  = '-flop '        ##  -flop  = horizontal flip
 
       os .system( imagemagick + options + fullname )
+
 
     elif ID2 == DGT2RLE:
       print( '{}  {} {}  DGT2 RL - Run Length Encoding {}'.format( decode, tail, cyan, outro ) )
@@ -298,41 +314,66 @@ def convert( img, outputpath ):
     elif ID == AIFF:
       print( '{}  {} {}  Audio Interchange File Format {}'.format( skip, tail, cyan, outro ) )
 
+
     elif ID == FILM:
-      print( '{}  {} {}  Cinepak Codec Video {}'.format( skip, tail, cyan, outro ) )
+      print( '{}  {} {}  Cinepak Codec - Audio and/or Video {}'.format( skip, tail, cyan, outro ) )
+
 
     elif ID4 == b'RIFF':
       print( '{}  {} {}  AudioVideo Interleave / Resource Interchange FileFormat {}'.format( skip, tail, cyan, outro ) )
 
+
     elif tail[:4] == 'cdda': 
       padding = ' ' * (len(tail) +10)
       print( '{}  {} {}  CDDA "Red Book" Audio {}'.format( skip, tail, cyan, outro ) )
-      print( '{} {} RAW 16‑bit Signed PCM,  44.1 kHz'.format( '\033[35m', padding, outro ) )
+      print( '{} {} RAW 16‑bit Signed PCM,  44.1 kHz\n'.format( '\033[35m', padding, outro ) )
+
 
     else:
       data .seek(0x10)
       HeaderPart2  = data .read(0x10)
-      ## print('{}  {} {}  Possible DGT index color mode {}'.format( skip, tail, cyan, outro ))
       if HeaderPart2 == DGT:
         print( '{}  {} {}  DGT index color mode {}'.format( skip, tail, cyan, outro ) )
+
 
       elif ext:
         if ext[-1] .isdigit():
           if ext[:-1] == '.en' or ext[:-1] == '.el':
-            print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
+            print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}\n'.format( skip, tail, purple, outro ) )
+
+
+        elif ext == '.bin':
+          print( '{}  {} {}  Machine language {}'.format( skip, tail, cyan, outro ) )
+
+
+        elif ext == '.seq':
+          print( '{}  {} {}  SSF - Saturn Sound Format sequence {}'.format( skip, tail, cyan, outro ) )
+
+
+        elif ext == '.ton':
+          print( '{}  {} {}  Audio Tones for SSF - Saturn Sound Format sequence {}'.format( skip, tail, cyan, outro ) )
+          print( '{}         Signed 8 or 16 bit PCM, Mono, likely 22050 Hz {}\n'.format( purple, outro ))
+
 
         elif ext == '.snd' or ext == '.pcm':
-          print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
+          print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}\n'.format( skip, tail, purple, outro ) )
+
+
+        elif ext == '.fon':
+          print( '{}  {} {}  Indexed Font, likely 4BPP 8x16 {}'.format( skip, tail, cyan, outro ) )
+          print( '{}          uses separate palette file for colors. {}\n'.format( purple, outro ))
+          
 
         elif ext == '.col' or ext == '.pal':
           print( '{}  {} {}  CLUT / Color LookUp Table / Indexed Palette {}'.format( decode, tail, cyan, outro ) )
 
+          colors  = 0
           data .seek(0x00)
           CLUT  = bytearray()
-          colors  = 0
+
           data2read  = True
           while data2read:
-            try:  
+            try:
               sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
               colors += 1
 
@@ -370,34 +411,50 @@ def convert( img, outputpath ):
           with open( fullname, 'wb' ) as output:
             output .write( data )
 
-        elif ext == '.seq':
-          print( '{}  {} {}  Saturn Sound Format sequence {}'.format( skip, tail, cyan, outro ) )
 
-        elif ext == '.bin':
-          print( '{}  {} {}  Machine language {}'.format( skip, tail, cyan, outro ) )
+        elif ext == '.raw' or ext == '.dat':
+          print( '{}  {} {}  Possibly RAW 15-bit BGR555 image.  Width >> 320 or 352{}'.format( decode, tail, cyan, outro ) )
+          print( '{}  Though it could be audio or other binary data... {}'.format( purple, outro ))
+          print( '{}  Expanding to 24-bit colorspace, so you can try opening in GIMP. {}'.format( purple, outro ))
 
-        elif ext == '.raw':
-          print( '{}  {} {}  RAW image {}'.format( decode, tail, cyan, outro ) )
-          width   = 320
-          height  = 224
-          depth   = 15
+          data .seek(0x03)
+          headersize = int( hexlify( data .read(0x01) ), 16 ) *3
+                                                           ##  ^~~  this would be 2,
+                                                           ##  but after expanding colorspace, 2 bytes = 3 bytes
+          print( '{}  expected Offset: {}  >>  noted in file extension {} \n'.format( cyan, headersize, outro ))
 
-          args = [ 'convert ',
-                   '-depth {} '.format( depth ),
-                   '-size {}x{} '.format( width, height ) ]
-          call  = '' .join( args )
+          data .seek(0x00)
+          barr  = bytearray()
+          data2read  = True
+          while data2read:
+            try:  sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
+            except:  data2read  = False  ##  quit trying once there's nothing left to read
 
-          inner  = 'RGB:{} '.format( img )
-          outer  = '{}.raw.png'.format( root )
-          output  = os.path .join( outputpath, outer )
+            ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
+            fifteenbit  = format( sixteenbit, '0>16b' )
 
-          print( '{}\n{}\n{}\n'.format( call, inner, output ) )
-          os .system( call + inner + output )
-          ##  convert -depth 16 -endian MSB -size widthxheight
-          ##  RGB:inpath/input.rgb  outpath/output.png
+            bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
+            gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
+            rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
+
+            ##  expand 5 bits to 8
+            BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
+            GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
+            RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
+
+            barr .append( RR )
+            barr .append( GG )
+            barr .append( BB )
+
+          outputname  = '{}.{}.data'.format( tail, headersize )
+          fullname  = os.path .join( outputpath, outputname )
+          with open( fullname, 'wb' ) as output:
+            output .write( barr )
+
 
         elif ext == '.tga':
           print( '{}  {} {}  Truevision TGA image {}'.format( decode, tail, cyan, outro ) )
+
           call  = 'convert '
           inner  = 'TGA:{} '.format( img )
           outer  = '{}.tga.png'.format( root )
@@ -407,23 +464,30 @@ def convert( img, outputpath ):
           os .system( call + inner + output )
           ##  convert TGA:inpath/input.tga outpath/output.raw.png
 
+
         elif len(ID) > 1:  ##  unknowns, print for observation
           print( '{}  {} {}  header: {} {}'.format( skip, tail, cyan, ID, outro ) )
+
 
         else:  ##  don't bother printing a blank 0x00 or 0xFF header
           print( '{}  {}'.format( skip, tail, cyan, outro ) )
 
+
       elif tail[:3] == 'bgm':
         padding = ' ' * (len(tail) +10)
         print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}'.format( skip, tail, cyan, outro ) )
-        print( '{} {} Little or No Endian, 22050 or 44100  '.format( '\033[35m', padding, outro ) )
+        print( '{} {} Little or No Endian, 22050 or 44100\n'.format( '\033[35m', padding, outro ) )
+
 
       elif len(ID) > 1:  ##  unknowns, print for observation
         print( '{}  {} {}  header: {} {}'.format( skip, tail, cyan, ID, outro ) )
 
+
       else:  ##  don't bother printing a blank 0x00 or 0xFF header
         print( '{}  {}'.format( skip, tail, cyan, outro ) )
 
+
+""" main  ============================================="""
 
 def main():
   ##  enable color for terminals that support it
@@ -438,9 +502,6 @@ def main():
     skip   = 'Skipping'
     purple = ''
     outro  = ''
-
-  info  = 'Convert Sega Saturn RGB images to PNG'
-  title  = 'satrgb'
 
   choice  = eg.buttonbox( info, title, ['one file', 'entire directory'] )
 
@@ -457,6 +518,7 @@ def main():
       default_out  = pickle .load( picklejar )
   else:  default_out  = cwd
 
+
   if choice == 'one file':
     imagefile  = eg.fileopenbox( 'choose image', title, default_in )
     if imagefile is None:  exit()
@@ -470,6 +532,7 @@ def main():
         with open( prevoutdir, 'wb' ) as picklejar:
           pickle .dump( outputdir, picklejar )
         convert( imagefile, outputdir )
+
 
   elif choice == 'entire directory':
     directory  = eg.diropenbox( 'choose dir', title, default_in )
