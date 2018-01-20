@@ -10,10 +10,11 @@ So far, this script extracts:
 >expands raw 15-bit BGR555 to 24-bit RGB data  
 >Truevision TGA  
 
-Can possibly read, need to find a disk with these image types to test on.  
+Can possibly read:  
 >DGT2 RL - Run Length Encoding  
 >DGT2 PP - Packed Pixel data  
 
+Need to find a disk with these image types to test on.  
 There's a few more formats, I'll add them, once deciphered.  
 
 Open one file, or an entire directory.  
