@@ -13,7 +13,7 @@ Can possibly read:
 - [ ] DGT2 RL - Run Length Encoding  
 - [ ] DGT2 PP - Packed Pixel data  
 
-Need to find a disk with these image types to test on.  
+*Need to find a disk with these image types to test on.*  
 There's a few more formats, I'll add them, once deciphered.  
 
 - [ ] DIGITIZER_3_Ver2
