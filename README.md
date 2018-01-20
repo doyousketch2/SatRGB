@@ -48,4 +48,9 @@ Usage depends on how you call Python scripts within your OS:
 Console output prefers to *print in color*,  
 so if you're on an old version of windows  
 that doesn't, then *enable VT100 emulation*  
-or try ANSICON  http://adoxa.altervista.org/ansicon
+or try ANSICON  http://adoxa.altervista.org/ansicon  
+
+Apps that do well for extractiong / viewing:  
+>GIMP - images  
+>VLC - video 
+>Audacity - audio  
