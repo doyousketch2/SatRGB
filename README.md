@@ -14,7 +14,7 @@ Can possibly read:
 - [ ] DGT2 PP - Packed Pixel data  
 
 *Need to find a disk with these image types to test on.*  
-Let me know if you find one.  
+*Let me know if you find any.*  
 
 There's a few more formats, I'll add them, once deciphered.  
 - [ ] DIGITIZER_3_Ver2
