@@ -2,20 +2,23 @@
 
 **satrgb.py** -- *extract RGB images from Sega Saturn files*  
 
----
 So far, this script extracts:  
->SEGA_32BITGRAPH data in RGB color mode  
->DGT2 DC - Direct Color data  
->CLUT / Color LookUp Table / Indexed Palette  
->expands raw 15-bit BGR555 to 24-bit RGB data  
->Truevision TGA  
+- [x] SEGA_32BITGRAPH data in RGB color mode  
+- [x] DGT2 DC - Direct Color data  
+- [x] CLUT / Color LookUp Table / Indexed Palette  
+- [x] expands raw 15-bit BGR555 to 24-bit RGB data  
+- [x] Truevision TGA  
 
 Can possibly read:  
->DGT2 RL - Run Length Encoding  
->DGT2 PP - Packed Pixel data  
+- [ ] DGT2 RL - Run Length Encoding  
+- [ ] DGT2 PP - Packed Pixel data  
 
 Need to find a disk with these image types to test on.  
 There's a few more formats, I'll add them, once deciphered.  
+
+- [ ] DIGITIZER_3_Ver2
+- [ ] SEGA_32BIT2DSCR
+- [ ] Sega_Super32X_2D
 
 Open one file, or an entire directory.  
 Select where you want your file(s) to be saved.  
