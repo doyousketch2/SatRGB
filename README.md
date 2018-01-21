@@ -1,6 +1,7 @@
 [![OpenSource](https://img.shields.io/badge/Open-Source-orange.svg)](https://github.com/doyousketch2)  [![PythonVersions](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)  [![License](https://img.shields.io/badge/license-GPL--v3-lightgrey.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)  [![Git.io](https://img.shields.io/badge/Git.io-vNcV1-233139.svg)](https://git.io/vNcV1) 
 
 **satrgb.py** -- *extract RGB images from Sega Saturn files*  
+For Educational purposes only.  
 
 So far, this script extracts:  
 - [x] SEGA_32BITGRAPH data in RGB color mode  
