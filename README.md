@@ -34,7 +34,7 @@ Can possibly read:
 *Need to find a disk with these image types to test on.*  
 *Let me know if you find any.*  
 
-There's a few more formats, I'll add them, once deciphered.  
+These are like 12 formats each, all rolled into one.  I'll add them, once deciphered.  
 - [ ] SEGA_32BIT2DSCR  
 - [ ] Sega_Super32X_2D  
 
