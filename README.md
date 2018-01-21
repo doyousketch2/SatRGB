@@ -55,7 +55,7 @@ so if you're on an old version of windows
 that doesn't, then *enable VT100 emulation*  
 or try ANSICON  http://adoxa.altervista.org/ansicon  
 
-Apps that do well for extractiong / viewing:  
+Apps that do well for extracting / viewing:  
 >GIMP - images  
 >VLC - video  
 >Audacity - audio  
