@@ -4,9 +4,9 @@
 
 So far, this script extracts:  
 - [x] SEGA_32BITGRAPH data in RGB color mode  
-- [x] DGT2 DC - Direct Color data  
 - [x] CLUT / Color LookUp Table / Indexed Palette  
 - [x] expanded raw 15-bit BGR555 to 24-bit RGB data  
+- [x] DGT2 DC - Direct Color data  
 - [x] Truevision TGA  
 
 Helps identify:  
