@@ -45,7 +45,8 @@ Select where you want your file(s) to be saved.
 It reads header information to determine image size,  
 then uses ImageMagick to do the conversion.  
 
-You'll need **Python**.  You may already have it installed.  If not:  
+You'll need **Python**.  You may already have it installed,  
+especially if you're on Linux or macOS.  If not:  
 https://www.python.org/downloads
 
 You'll need **ImageMagick**.  Try your package manager or  
