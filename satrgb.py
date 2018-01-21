@@ -79,8 +79,9 @@ def convert( img, outputpath ):
     ##  ~~~~  ~~~~~~       ~~~~~~~~~~~           ~~~~~~~
     ##  .arc  b'ARCH'      archive format        Zero Divide
     ##  .bz   b'BZ.w\x01'  nonstandard bzip      Tamagatchi Park
+    ##  .cmp               compression           Lunar SSS
     ##  .mf                multi file            Cotton 2
-    ##  .mfc  b'Rev.EXB'   similar to .tar
+    ##  .mfc  b'Rev.EXB'   similar to .tar       240 Body
     ##  .mid               nonstandard MIDI      Mortal Kombat 2
     ##  .mat               3D material
 
@@ -169,18 +170,21 @@ def convert( img, outputpath ):
       barr  = bytearray()
       data2read  = True
       while data2read:
-        try:  eightbit  = int( hexlify( data .read(0x01) ), 16 )
-        except:  data2read  = False  ##  quit trying once there's nothing left to read
+        try:  ##                                  v~~ byte
+          eightbit  = int( hexlify( data .read(0x01) ), 16 )
 
-        RR  = CLUT[ eightbit *3 ]
-        GG  = CLUT[ eightbit *3 +1 ]
-        BB  = CLUT[ eightbit *3 +2 ]
-        AA  = 255     ##  full alpha, no transparency
+          RR  = CLUT[ eightbit *3 ]
+          GG  = CLUT[ eightbit *3 +1 ]
+          BB  = CLUT[ eightbit *3 +2 ]
+          AA  = 255     ##  full alpha, no transparency
 
-        barr .append( AA )  ##  Image is mirrored and upside-down.
-        barr .append( BB )  ##  data's being stored as ABGR here,
-        barr .append( GG )  ##  this will actually read as RGBA in a moment,
-        barr .append( RR )  ##  once we reverse the bytearray()
+          barr .append( AA )  ##  Image is mirrored and upside-down.
+          barr .append( BB )  ##  data's being stored as ABGR here,
+          barr .append( GG )  ##  this will actually read as RGBA in a moment,
+          barr .append( RR )  ##  once we reverse the bytearray()
+
+        except:  ##  quit trying once there's nothing left to read
+          data2read  = False
 
       barr .reverse()  ## this fixes the upside-down part
       data  = generate_png( barr, width, height )
@@ -210,26 +214,29 @@ def convert( img, outputpath ):
       barr  = bytearray()
       data2read  = True
       while data2read:
-        try:  sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
-        except:  data2read  = False  ##  quit trying once there's nothing left to read
+        try:  ##                                    v~~ word
+          sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
 
-        ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
-        fifteenbit  = format( sixteenbit, '0>16b' )
+          ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
+          fifteenbit  = format( sixteenbit, '0>16b' )
 
-        bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
-        gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
-        rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
+          bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
+          gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
+          rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
 
-        ##  expand 5 bits to 8
-        BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
-        GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
-        RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
-        AA  = 255     ##  full alpha, no transparency
+          ##  expand 5 bits to 8
+          BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
+          GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
+          RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
+          AA  = 255     ##  full alpha, no transparency
 
-        barr .append( AA )  ##  Image is mirrored and upside-down.
-        barr .append( BB )  ##  data's being stored as ABGR here,
-        barr .append( GG )  ##  this will actually read as RGBA in a moment,
-        barr .append( RR )  ##  once we reverse the bytearray()
+          barr .append( AA )  ##  Image is mirrored and upside-down.
+          barr .append( BB )  ##  data's being stored as ABGR here,
+          barr .append( GG )  ##  this will actually read as RGBA in a moment,
+          barr .append( RR )  ##  once we reverse the bytearray()
+
+        except:  ##  quit trying once there's nothing left to read
+          data2read  = False
 
       barr .reverse()  ## this fixes the upside-down part
       data  = generate_png( barr, width, height )
@@ -279,21 +286,23 @@ def convert( img, outputpath ):
       barr  = bytearray()
       data2read  = True
       while data2read:
-        try:
+        try:  ##                                   v~~ byte
           runlength  = int( hexlify( data .read(0x01) ), 16 )
           eightbit  = int( hexlify( data .read(0x01) ), 16 )
-        except:  data2read  = False  ##  quit trying once there's nothing left to read
 
-        for x in range( runlength ):  ##  repeat amount specified by run length
-          RR  = CLUT[ eightbit *3 ]
-          GG  = CLUT[ eightbit *3 +1 ]
-          BB  = CLUT[ eightbit *3 +2 ]
-          AA  = 255     ##  full alpha, no transparency
+          for x in range( runlength ):  ##  repeat amount specified by run length
+            RR  = CLUT[ eightbit *3 ]
+            GG  = CLUT[ eightbit *3 +1 ]
+            BB  = CLUT[ eightbit *3 +2 ]
+            AA  = 255     ##  full alpha, no transparency
 
-          barr .append( AA )  ##  Image is mirrored and upside-down.
-          barr .append( BB )  ##  data's being stored as ABGR here,
-          barr .append( GG )  ##  this will actually read as RGBA in a moment,
-          barr .append( RR )  ##  once we reverse the bytearray()
+            barr .append( AA )  ##  Image is mirrored and upside-down.
+            barr .append( BB )  ##  data's being stored as ABGR here,
+            barr .append( GG )  ##  this will actually read as RGBA in a moment,
+            barr .append( RR )  ##  once we reverse the bytearray()
+
+        except:  ##  quit trying once there's nothing left to read
+          data2read  = False
 
       barr .reverse()  ## this fixes the upside-down part
       data  = generate_png( barr, width, height )
@@ -329,11 +338,81 @@ def convert( img, outputpath ):
       print( '{} {} RAW 16‑bit Signed PCM,  44.1 kHz\n'.format( '\033[35m', padding, outro ) )
 
 
-    else:
+    else:  ##  DGT
       data .seek(0x10)
-      HeaderPart2  = data .read(0x10)
-      if HeaderPart2 == DGT:
+      Identifier2  = data .read(0x10)
+      if Identifier2 == DGT:
         print( '{}  {} {}  DGT index color mode {}'.format( skip, tail, cyan, outro ) )
+
+        data .seek(0x02)  ##                      v~~ 16 bit Word
+        headerSize  = int( hexlify( data .read(0x02) ), 16 )
+
+        data .seek(0x07)  ##                    v~~ Byte
+        dirEntry  = int( hexlify( data .read(0x01) ), 16 )
+
+        ##  File size excluding header...  does that exclude CLUT as well?
+        fileSize = int( hexlify( data .read(0x04) ), 16 )
+        data .seek(0x100)  ##  Directory       }~~ 32 bit Long
+        dirSize  = int( hexlify( data .read(0x04) ), 16 )
+        CLUTsize = dirSize -0x20
+
+        ##  horiz and vert display positions not really needed for our purposes,
+        horizDispPos = int( hexlify( data .read(0x02) ), 16 )
+        vertDispPos  = int( hexlify( data .read(0x02) ), 16 )
+        ##  but who knows, might be needed for alignment with other sprites,
+        ##  so we could print the info out, later on, if needed.
+
+        width  = int( hexlify( data .read(0x02) ), 16 )
+        height = int( hexlify( data .read(0x02) ), 16 )
+
+        ##  file name excluding extension...  filename for what ??
+        dirName  = hexlify( data .read(0x10) )
+        if dirName .startswith(' '):  pass  ##  if it starts with a space, dir's empty?
+        else:                         pass  ##  otherwise, what?
+
+        data .seek(0x120)  ##  CLUT
+        colors  = CLUTsize /4
+        CLUT  = {}
+        for color in range( colors ):
+          key  = int( hexlify( data .read(0x02) ), 16 )
+          val  = int( hexlify( data .read(0x02) ), 16 )
+          CLUT[ key ]  = val
+
+        barr  = bytearray()
+        data2read  = True
+        while data2read:
+          try:  ##                                    v~~ word
+            sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
+
+            RR  = CLUT[ sixteenbit ][1:6 ]
+            GG  = CLUT[ sixteenbit ][6:11]
+            BB  = CLUT[ sixteenbit ][11: ]
+            AA  = 255     ##  full alpha, no transparency
+
+            barr .append( AA )  ##  Image is mirrored and upside-down.
+            barr .append( BB )  ##  data's being stored as ABGR here,
+            barr .append( GG )  ##  this will actually read as RGBA in a moment,
+            barr .append( RR )  ##  once we reverse the bytearray()
+
+          except:
+            data2read  = False  ##  quit trying once there's nothing left to read
+
+        barr .reverse()  ## this fixes the upside-down part
+        data  = generate_png( barr, width, height )
+
+        outputname  = '{}.DGT.png'.format( tail )
+        fullname  = os.path .join( outputpath, outputname )
+        with open( fullname, 'wb' ) as output:
+          output .write( data )
+
+        ##  it's right-side-up now, but backwards, need to mirror it.
+                                   ##  'convert' would generate a new image
+        imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
+        options  = '-flop '        ##  -flop  = horizontal flip
+
+        os .system( imagemagick + options + fullname )
+
+
 
 
       elif ext:
@@ -369,7 +448,7 @@ def convert( img, outputpath ):
 
           data2read  = True
           while data2read:
-            try:
+            try:  ##                                    v~~ word
               sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
               colors += 1
 
@@ -415,35 +494,38 @@ def convert( img, outputpath ):
           print( '{}  Expanding to 24-bit colorspace, so you can attempt opening in GIMP. {}'.format( purple, outro ))
 
           data .seek(0x03)
-          headersize = int( hexlify( data .read(0x01) ), 16 ) *3
+          headerSize = int( hexlify( data .read(0x01) ), 16 ) *3
                                                            ##  ^~~  this would be 2,
                                                            ##  but after expanding colorspace, 2 bytes = 3 bytes
-          print( '{}  expected Offset: {}  >>  noted in file extension {} \n'.format( cyan, headersize, outro ))
+          print( '{}  expected Offset: {}  >>  noted in file extension {} \n'.format( cyan, headerSize, outro ))
 
           data .seek(0x00)
           barr  = bytearray()
           data2read  = True
           while data2read:
-            try:  sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
-            except:  data2read  = False  ##  quit trying once there's nothing left to read
+            try:  ##                                    v~~ word
+              sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
 
-            ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
-            fifteenbit  = format( sixteenbit, '0>16b' )
+              ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
+              fifteenbit  = format( sixteenbit, '0>16b' )
 
-            bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
-            gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
-            rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
+              bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
+              gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
+              rr  = int( fifteenbit[11: ], 2 )  ##  rrrrr
 
-            ##  expand 5 bits to 8
-            BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
-            GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
-            RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
+              ##  expand 5 bits to 8
+              BB  = ( bb << 3 ) | ( bb >> 2 )  ##  bbbbbbbb
+              GG  = ( gg << 3 ) | ( gg >> 2 )  ##  gggggggg
+              RR  = ( rr << 3 ) | ( rr >> 2 )  ##  rrrrrrrr
 
-            barr .append( RR )
-            barr .append( GG )
-            barr .append( BB )
+              barr .append( RR )
+              barr .append( GG )
+              barr .append( BB )
 
-          outputname  = '{}.{}.data'.format( tail, headersize )
+            except:  ##  quit trying once there's nothing left to read
+              data2read  = False
+
+          outputname  = '{}.{}.data'.format( tail, headerSize )
           fullname  = os.path .join( outputpath, outputname )
           with open( fullname, 'wb' ) as output:
             output .write( barr )
