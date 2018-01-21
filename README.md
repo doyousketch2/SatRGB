@@ -21,13 +21,14 @@ There's a few more formats, I'll add them, once deciphered.
 - [ ] SEGA_32BIT2DSCR
 - [ ] Sega_Super32X_2D
 
-Open one file, or an entire directory.  
+---
+
+**Open** one file, *or an entire directory.*  
 Select where you want your file(s) to be saved.  
 
 It reads header information to determine image size,  
 then uses ImageMagick to do the conversion.  
 
----
 You'll need **Python**.  You may already have it installed.  If not:  
 https://www.python.org/downloads
 
