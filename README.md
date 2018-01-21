@@ -17,10 +17,13 @@ Helps identify:
 - [x] CDDA CD Redbook audio  
 - [x] RAW PCM Audio  
 - [x] Machine Language  
+- [x] Other files with text in their header.  
 - [x] SSF - Saturn Sound Format sequence
 - [x] Audio Tones for SSF  
 - [x] Indexed Fonts  
-- [x] Other files with text in their header.
+
+Which you can possibly view with my font viewer:  
+https://github.com/doyousketch2/theSegSat
 
 Can possibly read:  
 - [ ] DGT2 RL - Run Length Encoding  
