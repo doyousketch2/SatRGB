@@ -38,7 +38,7 @@ There's a few more formats, I'll add them, once deciphered.
 - [ ] SEGA_32BIT2DSCR  
 - [ ] Sega_Super32X_2D  
 
-They're an absolute b!7c# tho.  Digital origami.  
+They're an absolute *b!7c#* tho.  Digital origami.  
 Code-folding like no other.  
 
 ---
