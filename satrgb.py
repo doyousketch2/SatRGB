@@ -342,7 +342,7 @@ def convert( img, outputpath ):
       data .seek(0x10)
       Identifier2  = data .read(0x10)
       if Identifier2 == DGT:
-        print( '{}  {} {}  DGT index color mode {}'.format( skip, tail, cyan, outro ) )
+        print( '{}  {} {}  DGT index color mode {}'.format( decode, tail, cyan, outro ) )
 
         data .seek(0x02)  ##                      v~~ 16 bit Word
         headerSize  = int( hexlify( data .read(0x02) ), 16 )
