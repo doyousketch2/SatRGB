@@ -23,7 +23,7 @@ There's a few more formats, I'll add them, once deciphered.
 
 ---
 
-**Open** one file, *or an entire directory.*  
+Open one file, *or an entire directory.*  
 Select where you want your file(s) to be saved.  
 
 It reads header information to determine image size,  
