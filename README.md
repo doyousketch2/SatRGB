@@ -28,14 +28,14 @@ https://github.com/doyousketch2/theSegSat
 Can possibly read:  
 - [ ] DGT2 RL - Run Length Encoding  
 - [ ] DGT2 PP - Packed Pixel data  
+- [ ] DIGITIZER_3_Ver2  
 
 *Need to find a disk with these image types to test on.*  
 *Let me know if you find any.*  
 
 There's a few more formats, I'll add them, once deciphered.  
-- [ ] DIGITIZER_3_Ver2
-- [ ] SEGA_32BIT2DSCR
-- [ ] Sega_Super32X_2D
+- [ ] SEGA_32BIT2DSCR  
+- [ ] Sega_Super32X_2D  
 
 ---
 
