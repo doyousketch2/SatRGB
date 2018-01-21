@@ -413,9 +413,10 @@ def convert( img, outputpath ):
 
 
         elif ext == '.raw' or ext == '.dat':
-          print( '{}  {} {}  Possibly RAW 15-bit BGR555 image.  Width >> 320 or 352{}'.format( decode, tail, cyan, outro ) )
-          print( '{}  Though it could be audio or other binary data... {}'.format( purple, outro ))
-          print( '{}  Expanding to 24-bit colorspace, so you can try opening in GIMP. {}'.format( purple, outro ))
+          print( '{}  {} {}  Possibly RAW 15-bit BGR555 image. Width >> 320 or 352 {}'.format( decode, tail, cyan, outro ) )
+          print( '{}  May contain multiple images with smaller widths, especially if you see juttered pixels. {}'.format( purple, outro ) )
+          print( '{}  Sizes tend to be multiples of 8.  Though it could be audio or other binary data... {}'.format( purple, outro ))
+          print( '{}  Expanding to 24-bit colorspace, so you can attempt opening in GIMP. {}'.format( purple, outro ))
 
           data .seek(0x03)
           headersize = int( hexlify( data .read(0x01) ), 16 ) *3
