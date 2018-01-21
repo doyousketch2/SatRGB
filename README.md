@@ -9,6 +9,19 @@ So far, this script extracts:
 - [x] expanded raw 15-bit BGR555 to 24-bit RGB data  
 - [x] Truevision TGA  
 
+Helps identify:  
+- [x] Audio Interchange File Format  
+- [x] Cinepack Codec - Audio and/or Video  
+- [x] AVI / RIFF  
+- [x] SEGA 3D  
+- [x] CDDA CD Redbook audio  
+- [x] RAW PCM Audio  
+- [x] Machine Language  
+- [x] SSF - Saturn Sound Format sequence
+- [x] Audio Tones for SSF  
+- [x] Indexed Fonts  
+- [x] Other files with text in their header.
+
 Can possibly read:  
 - [ ] DGT2 RL - Run Length Encoding  
 - [ ] DGT2 PP - Packed Pixel data  
