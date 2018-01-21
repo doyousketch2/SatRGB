@@ -342,10 +342,6 @@ def convert( img, outputpath ):
             print( '{}  {} {}  RAW Signed 8 or 16 bit PCM Audio {}\n'.format( skip, tail, purple, outro ) )
 
 
-        elif ext == '.bin':
-          print( '{}  {} {}  Machine language {}'.format( skip, tail, cyan, outro ) )
-
-
         elif ext == '.seq':
           print( '{}  {} {}  SSF - Saturn Sound Format sequence {}'.format( skip, tail, cyan, outro ) )
 
@@ -412,10 +408,10 @@ def convert( img, outputpath ):
             output .write( data )
 
 
-        elif ext == '.raw' or ext == '.dat':
+        elif ext == '.bin' or ext == '.dat' or ext == '.raw':
           print( '{}  {} {}  Possibly RAW 15-bit BGR555 image. Width >> 320 or 352 {}'.format( decode, tail, cyan, outro ) )
           print( '{}  May contain multiple images with smaller widths, especially if you see juttered pixels. {}'.format( purple, outro ) )
-          print( '{}  Sizes tend to be multiples of 8.  Though it could be audio or other binary data... {}'.format( purple, outro ))
+          print( '{}  Sizes tend to be multiples of 8.  Though it could be indexed, audio, or other binary data... {}'.format( purple, outro ))
           print( '{}  Expanding to 24-bit colorspace, so you can attempt opening in GIMP. {}'.format( purple, outro ))
 
           data .seek(0x03)
