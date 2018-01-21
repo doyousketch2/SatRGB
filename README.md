@@ -22,7 +22,7 @@ Helps identify:
 - [x] Audio Tones for SSF  
 - [x] Indexed Fonts  
 
-Which you can possibly view with my font viewer:  
+...Which you can view in my font viewer:  
 https://github.com/doyousketch2/theSegSat
 
 Can possibly read:  
