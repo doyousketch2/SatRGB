@@ -413,8 +413,6 @@ def convert( img, outputpath ):
         os .system( imagemagick + options + fullname )
 
 
-
-
       elif ext:
         if ext[-1] .isdigit():
           if ext[:-1] == '.en' or ext[:-1] == '.el':
