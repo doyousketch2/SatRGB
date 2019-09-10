@@ -28,7 +28,7 @@ https://github.com/doyousketch2/theSegSat
 
 Can possibly read:  
 - [ ] DGT2 RL - Run Length Encoding  
-- [x] DGT2 PP - Packed Pixel data  thanks VGKintsugi, I believe it does now.  
+- [x] DGT2 PP - Packed Pixel data.  --  thanks VGKintsugi, I believe it does now.  
 - [ ] DIGITIZER_3_Ver2  
 
 *Need to find a disk with these image types to test on.*  
