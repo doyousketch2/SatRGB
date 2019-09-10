@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#! /usr/bin/env python3
 """====================================================="""
 ##  satrgb.py                                   14 Jan 2018
 ##  extract RGB images from Saturn files
@@ -127,8 +126,8 @@ def convert( img, outputpath ):
       outer  = '{}.rgb.png'.format( root )
       output  = os.path .join( outputpath, outer )
 
-      os .system( call + inner + output )
       print( '{}\n{}\n{}\n'.format( call, inner, output ) )
+      os .system( call + inner + '"' + output + '"' )
 
       ##  convert -depth 8 -endian MSB -size 144x192+256
       ##  RGB:inpath/input.rgb  outpath/output.rgb.png
@@ -152,7 +151,7 @@ def convert( img, outputpath ):
         sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
 
         ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
-        fifteenbit  = format( color, '0>16b' )
+        fifteenbit  = format( sixteenbit, '0>16b' )
 
         bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
         gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
@@ -199,8 +198,8 @@ def convert( img, outputpath ):
       imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
       options  = '-flop '        ##  -flop  = horizontal flip
 
-      os .system( imagemagick + options + fullname )
-
+      print( imagemagick, options, fullname )
+      os .system( imagemagick + options + '"' + fullname +'"' )
 
     elif ID2 == DGT2DC:
       print( '{}  {} {}  DGT2 DC - Direct Color data {}'.format( decode, tail, cyan, outro ) )
@@ -251,7 +250,8 @@ def convert( img, outputpath ):
       imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
       options  = '-flop '        ##  -flop  = horizontal flip
 
-      os .system( imagemagick + options + fullname )
+      print( imagemagick, options, fullname )
+      os .system( imagemagick + options + '"' + fullname +'"' )
 
 
     elif ID2 == DGT2RLE:
@@ -268,7 +268,7 @@ def convert( img, outputpath ):
         sixteenbit  = int( hexlify( data .read(0x02) ), 16 )
 
         ##  still 16 bits, we'll just ignore unused top bit  xbbbbbgggggrrrrr
-        fifteenbit  = format( color, '0>16b' )
+        fifteenbit  = format( sixteenbit, '0>16b' )
 
         bb  = int( fifteenbit[1:6 ], 2 )  ##  bbbbb
         gg  = int( fifteenbit[6:11], 2 )  ##  ggggg
@@ -317,7 +317,8 @@ def convert( img, outputpath ):
       imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
       options  = '-flop '        ##  -flop  = horizontal flip
 
-      os .system( imagemagick + options + fullname )
+      print( imagemagick, options, fullname )
+      os .system( imagemagick + options + '"' + fullname +'"' )
 
 
     elif ID == AIFF:
@@ -410,7 +411,8 @@ def convert( img, outputpath ):
         imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
         options  = '-flop '        ##  -flop  = horizontal flip
 
-        os .system( imagemagick + options + fullname )
+      print( imagemagick, options, fullname )
+      os .system( imagemagick + options + '"' + fullname +'"' )
 
 
       elif ext:
@@ -538,7 +540,7 @@ def convert( img, outputpath ):
           output  = os.path .join( outputpath, outer )
 
           print( '{}{}\n            {}\n'.format( call, inner, output ) )
-          os .system( call + inner + output )
+          os .system( call + inner + '"' + output + '"' )
           ##  convert TGA:inpath/input.tga outpath/output.raw.png
 
 
