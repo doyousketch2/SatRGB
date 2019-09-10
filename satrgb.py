@@ -411,8 +411,8 @@ def convert( img, outputpath ):
         imagemagick  = 'mogrify '  ##  'mogrify' will edit image in place.
         options  = '-flop '        ##  -flop  = horizontal flip
 
-      print( imagemagick, options, fullname )
-      os .system( imagemagick + options + '"' + fullname +'"' )
+        print( imagemagick, options, fullname )
+        os .system( imagemagick + options + '"' + fullname +'"' )
 
 
       elif ext:
@@ -540,7 +540,7 @@ def convert( img, outputpath ):
           output  = os.path .join( outputpath, outer )
 
           print( '{}{}\n            {}\n'.format( call, inner, output ) )
-          os .system( call + inner + '"' + output + '"' )
+          os .system( call + inner + output )
           ##  convert TGA:inpath/input.tga outpath/output.raw.png
 
 
